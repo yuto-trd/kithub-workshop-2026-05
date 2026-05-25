@@ -1,0 +1,36 @@
+services:
+  hub:
+    image: andrius/asterisk:stable
+    container_name: asterisk-hub
+    networks:
+      asterisk_net:
+        ipv4_address: 172.20.0.10
+    ports:
+      - "5060:5060/udp"
+      - "10000-10100:10000-10100/udp"
+    volumes:
+      - ./hub/pjsip.conf:/etc/asterisk/pjsip.conf:ro
+      - ./hub/extensions.conf:/etc/asterisk/extensions.conf:ro
+    restart: unless-stopped
+
+  site-z:
+    image: andrius/asterisk:stable
+    container_name: asterisk-site-z
+    networks:
+      asterisk_net:
+        ipv4_address: 172.20.0.20
+    ports:
+      - "5160:5060/udp"
+      - "10200-10300:10200-10300/udp"
+    volumes:
+      - ./site-z/pjsip.conf:/etc/asterisk/pjsip.conf:ro
+      - ./site-z/extensions.conf:/etc/asterisk/extensions.conf:ro
+      - ./site-z/rtp.conf:/etc/asterisk/rtp.conf:ro
+    restart: unless-stopped
+
+networks:
+  asterisk_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
